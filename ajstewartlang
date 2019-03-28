@@ -1,0 +1,21 @@
+library(tidyverse)
+
+board_games <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-03-12/board_games.csv")
+
+# Create a new data frame for the points we want to plot
+names <- c("Acquire", "Mouse Trap", "The Settlers of Catan: 15th Anniversary Wood Edition", "Connect Four", "Twilight Struggle")
+highlight <- board_games %>% filter(name %in% names)
+
+board_games %>%
+  group_by(factor(year_published)) %>%
+  mutate(average = mean(average_rating)) %>%
+  ggplot(aes(x = year_published)) +
+  geom_point(aes(y = average_rating), alpha = .05) + 
+  #geom_line(aes(y = average, colour = "red")) +
+  geom_smooth(aes(y = average, colour = "blue"), se = FALSE) +
+  guides(colour = FALSE) +
+  labs(y = "Average mean rating", x = "") +
+  ggtitle("A Golden Age of Board Games?", subtitle = "Average user ratings by games for original year of production") +
+  theme_bw() +
+  geom_text(data = highlight, aes(x = year_published, y = average_rating, label = name), nudge_y = .4) +
+  geom_point(data = highlight, aes(x = year_published, y = average_rating), alpha = 1)
