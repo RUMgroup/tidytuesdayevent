@@ -1,0 +1,33 @@
+library(tidyverse)
+
+board_games <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-03-12/board_games.csv")
+
+p<-board_games%>%
+  filter(users_rated>=50)%>%
+  group_by(max_players)%>%
+  summarize(avg_ratng = mean(average_rating))%>%
+  filter(max_players>1 & max_players<9)%>%
+  ggplot(aes(x=max_players, y=avg_ratng))+
+  geom_line(color="red",size=2)+
+  geom_point(color="red",size=4)+
+  theme(panel.grid.major = element_line(colour = "lightgray"),panel.grid.minor = element_blank(), 
+        plot.background = element_rect(fill = "gray92"),
+        plot.title = element_text(size=18,face = "bold"),
+        plot.subtitle =  element_text(size=14),
+        axis.text = element_text(family="mono",size=12),
+        axis.title = element_text(size=14),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+        axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))+
+  labs(title="Three Players Might Be A Sweet Spot", 
+        subtitle = "Average user ratings for games by maximum number of players",
+        y="Average user rating",
+        x="Max players")+
+  scale_x_continuous(breaks=2:8)+
+  scale_y_continuous(breaks=seq(6.0,6.8,0.2), limits = c(6,6.7))
+
+
+g <- ggplotGrob(p)
+g$layout$l[g$layout$name == "title"] <- 1
+g$layout$l[g$layout$name == "subtitle"] <- 1
+grid::grid.draw(g)
+
